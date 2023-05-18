@@ -8,8 +8,13 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoutes";
 import PublicRoute from "./routes/PublicRoutes";
 import AddCampaign from "./pages/AddCampaign";
+import Conversations from "./pages/Conversations";
+import { useNavigationInterceptor } from "./AxiosInterceptor";
+import Conversation from "./pages/Conversation";
 
 const App: React.FC = () => {
+  useNavigationInterceptor();
+
   return (
     <>
       <Routes>
@@ -37,11 +42,35 @@ const App: React.FC = () => {
               </ProtectedRoute>
             }
           />
-            <Route
+          <Route
             path="add"
             element={
               <ProtectedRoute>
                 <AddCampaign />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="edit/:id"
+            element={
+              <ProtectedRoute>
+                <AddCampaign />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="conversations"
+            element={
+              <ProtectedRoute>
+                <Conversations />
+              </ProtectedRoute>
+            }
+          />
+            <Route
+            path="conversation/:id"
+            element={
+              <ProtectedRoute>
+                <Conversation />
               </ProtectedRoute>
             }
           />

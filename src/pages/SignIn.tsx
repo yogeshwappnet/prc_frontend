@@ -20,7 +20,6 @@ const theme = createTheme();
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
-  const { showLoading } = useNotification();
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
 
@@ -44,14 +43,11 @@ const SignIn: React.FC = () => {
       return;
     }
 
-    showLoading(true);
-
     AuthService.login(email, password)
       .then((response: any) => {
-        showLoading(false);
         const userData = response?.data?.access_token;
         localStorage.setItem("access_token", userData);
-        navigate('/dashboard')
+        navigate("/dashboard");
       })
       .catch((error) => {
         toast.error("Invalid User");
@@ -69,7 +65,7 @@ const SignIn: React.FC = () => {
               marginTop: 8,
               display: "flex",
               flexDirection: "column",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -78,12 +74,7 @@ const SignIn: React.FC = () => {
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-              sx={{ mt: 1 }}
-            >
+            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 required
@@ -94,14 +85,12 @@ const SignIn: React.FC = () => {
                 autoComplete="email"
                 autoFocus
                 error={emailError}
-                helperText={
-                  emailError ? "Please enter a valid email address" : ""
-                }
+                helperText={emailError ? "Please enter a valid email address" : ""}
                 onBlur={(e) => {
                   setEmailError(!e.target.value);
                 }}
                 inputProps={{
-                  pattern: "\\S+@\\S+\\.\\S+",
+                  pattern: "\\S+@\\S+\\.\\S+"
                 }}
               />
               <TextField
@@ -119,12 +108,7 @@ const SignIn: React.FC = () => {
                   setPasswordError(!e.target.value);
                 }}
               />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
+              <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                 Sign In
               </Button>
             </Box>

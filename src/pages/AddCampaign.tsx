@@ -1,49 +1,126 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  Grid,
-  Switch,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Divider, FormControl, Grid, Switch, TextField, Typography } from "@mui/material";
 import useNotification from "../hooks/useNotification";
 import { useNavigate, useParams } from "react-router-dom";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import CampaignService from "../services/CampaignService";
 
 type AddCampaignForm = {
-  name: string;
+  campaignName: string;
   status: string;
   forwardIncomingCall: boolean;
   forwardIncomingCallNumber: string;
   receipts: string;
   timeOfDay: string;
+  messages: string;
 };
 
 const AddCampaign: React.FC = () => {
+  const [campaignMessages, setCampaignMessages] = useState<
+    Array<{
+      messageNumber: string;
+      messageText: string;
+      delay: string;
+    }>
+  >([]);
+
+  const handleAddMessage = () => {
+    setCampaignMessages([
+      ...campaignMessages,
+      {
+        messageNumber: (campaignMessages.length + 1).toString(),
+        messageText: "",
+        delay: "0 Day"
+      }
+    ]);
+  };
+
   const { id } = useParams();
 
   const navigate = useNavigate();
+
+  const validationSchema = Yup.object().shape({
+    campaignName: Yup.string()
+      .required("Name is required")
+      .matches(/^[a-zA-Z]+$/, "Campaign name must contain only alphabets"),
+
+    timeOfDay: Yup.string().required("Time of the day is required"),
+    campaignMessage: Yup.string().required("Campaign message is required")
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors }
+  } = useForm<AddCampaignForm>({
+    resolver: yupResolver(validationSchema)
+  });
+
+  const onSubmit = (data: AddCampaignForm) => {
+    const payload: any = {
+      name: data.campaignName,
+      status: data.status,
+      forwardIncomingCall: data.forwardIncomingCall,
+      forwardIncomingCallNumber: data.forwardIncomingCallNumber,
+      receipts: data.receipts,
+      filter: [
+        {
+          attribute: "owner_id",
+          operator: "is_in",
+          value: ["17000096272"],
+          tableName: "sales_account"
+        },
+        {
+          attribute: "cf_has_local_owner",
+          operator: "is_in",
+          value: ["Yes"],
+          tableName: "sales_account"
+        },
+        {
+          attribute: "owner_id",
+          operator: "is_in",
+          value: ["17000089212"],
+          tableName: "contact"
+        }
+      ],
+      timeOfDay: data.timeOfDay,
+      messages: campaignMessages.map((message) => ({
+        messageNumber: message.messageNumber,
+        messageText: message.messageText,
+        delay: message.delay
+      }))
+    };
+    CampaignService.addCampaignMessage(payload).then(
+      (response: any) => {
+        reset();
+        console.log(">>>>>>>>>>", response);
+        navigate("/");
+      }
+    );
+  };
+
   return (
     <>
-      <Box component="form">
-        <Grid
-          container
-          spacing={12}
-          sx={{ mb: 4, alignItems: "center", justifyContent: "space-between" }}
-        >
+      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+        <Grid spacing={12} sx={{ mb: 4, alignItems: "center", justifyContent: "space-between" }}>
           <Grid item xs={5}>
             <TextField
+              error={errors.campaignName ? true : false}
               sx={{ width: "100%" }}
               id="filled-multiline-static"
               label="Campaign Name"
+              {...register("campaignName")}
+              type="text"
+              // required
+              helperText={errors.campaignName?.message}
             />
           </Grid>
           <Grid item xs={4}>
-            <label> Status: </label>{" "}
-            <Switch inputProps={{ "aria-label": "controlled" }} />{" "}
-            <label> Active</label>
+            <label> Status: </label> <Switch inputProps={{ "aria-label": "controlled" }} /> <label> Active</label>
           </Grid>
         </Grid>
         <Divider sx={{ my: 1, mb: 3 }} />
@@ -53,7 +130,7 @@ const AddCampaign: React.FC = () => {
           sx={{
             mb: 3,
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "space-between"
           }}
         >
           <Grid item xs={4}>
@@ -63,10 +140,13 @@ const AddCampaign: React.FC = () => {
           </Grid>
           <Grid item xs={4}>
             <TextField
+              error={errors.timeOfDay ? true : false}
               type="time"
               sx={{ width: "100%" }}
+              {...register("timeOfDay", { required: true })}
               id="filled-multiline-static"
               label="Time of the Day"
+              helperText={errors.timeOfDay?.message}
             />
           </Grid>
         </Grid>
@@ -77,56 +157,46 @@ const AddCampaign: React.FC = () => {
           sx={{
             mt: 2,
             mb: 2,
-            justifyContent: "space-between",
+            justifyContent: "space-between"
           }}
         >
           <Grid item xs={7}>
-            <TextField
-              sx={{ width: "100%", mb: 2 }}
-              id="filled-multiline-static"
-              label="Message 1"
-              multiline
-              rows={4}
-            />
-            <div className="interval">
-              Interval:
-              <TextField
-              sx={{width: "8%", ml: 2, mr: 2}}
-                id="outlined-basic"
-                label=""
-                variant="outlined"
-              />
-              days after first message.
-            </div>
-
-            <TextField
-              sx={{ width: "100%", mb: 2 }}
-              id="filled-multiline-static"
-              label="Message 2"
-              multiline
-              rows={4}
-            />
-            <div className="interval">
-              Interval:
-              <TextField
-              sx={{width: "8%", ml: 2, mr: 2}}
-                id="outlined-basic"
-                label=""
-                variant="outlined"
-              />
-              days after first message.
-            </div>
-            <TextField
-              sx={{ width: "100%", mb: 2 }}
-              id="filled-multiline-static"
-              label="Message 3"
-              multiline
-              rows={4}
-            />
+            {campaignMessages.map((message, index) => (
+              <div key={index}>
+                <Typography variant="h6" sx={{ mt: 2 }}>
+                  Message {message.messageNumber}
+                </Typography>
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  <Grid item xs={12}>
+                    <TextField
+                      sx={{ width: "100%", mb: 2 }}
+                      label={`Message Text ${message.messageNumber}`}
+                      error={Boolean(errors.messages?.[index]?.messageText)}
+                      helperText={errors.messages?.[index]?.messageText?.message}
+                      multiline
+                      rows={4}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className="interval">
+                      Interval:
+                      <TextField
+                        sx={{ width: "8%", ml: 2, mr: 2 }}
+                        label={`Delay for Message ${message.messageNumber}`}
+                        variant="outlined"
+                        error={Boolean(errors.messages?.[index]?.delay)}
+                        helperText={errors.messages?.[index]?.delay?.message}
+                      />
+                      days after first message.
+                    </div>
+                  </Grid>
+                </Grid>
+              </div>
+            ))}
             <Button
-              type="submit"
+              onClick={handleAddMessage}
               sx={{
-                mt: 2,
+                mt: 2
               }}
               fullWidth
               variant="contained"
@@ -137,7 +207,7 @@ const AddCampaign: React.FC = () => {
               type="submit"
               sx={{
                 mt: 2,
-                width: "100%",
+                width: "100%"
               }}
               fullWidth
               variant="contained"

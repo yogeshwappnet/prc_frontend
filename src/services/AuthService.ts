@@ -1,8 +1,8 @@
-import http from "../http-common";
+import api from "../AxiosInterceptor";
 import IAuth from "../types/Auth";
 
 const login = (email: string, password: string) => {
-  return http.post<IAuth>(`/auth/login`, { email: email, password: password });
+  return api.post<IAuth>(`/auth/login`, { email: email, password: password });
 };
 
 const AuthService = {

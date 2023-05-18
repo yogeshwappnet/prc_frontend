@@ -1,43 +1,164 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
-.stats{
+.stats {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 20px;
 }
 
-.stat-number{
+.stat-number {
   font-size: 28px;
 }
 
-.stat-label{
+.stat-label {
   font-size: 18px;
 }
 
-.stats-container{
+.stats-container {
   display: flex;
   flex-direction: column;
   gap: 40px;
 }
 
-.ml-16{
+.ml-16 {
   margin-left: 16px;
 }
 
-.interval{
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.interval {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
 }
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 10px;
+}
+
+.gap-4 {
+  gap: 20px;
+}
+
+.button-avatar {
+  background-color: cornflowerblue;
+  color: white;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  border-radius: 19px;
+  justify-content: center;
+  font-weight: 600;
+}
+.black {
+  background-color: black;
+}
+
+.font-12 {
+  font-size: 12px;
+}
+
+.font-14 {
+  font-size: 14px;
+}
+
+.campaignName {
+  font-size: 12px;
+  padding: 5px 10px;
+  background: midnightblue;
+  color: #fff;
+  border-radius: 10px;
+  margin: 5px 0px;
+}
+
+.c-name {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.time-name {
+  font-size: 12px;
+  margin-left: 10px;
+  font-weight: normal;
+}
+
+.mt-2 {
+  margin-top: 20px;
+}
+
+.w-70 {
+  width: 70%;
+}
+
+.calc-height {
+  height: calc(100vh - 430px);
+  overflow: auto;
+}
+
+.max-width {
+  max-width: 100% !important;
+}
+
+.trnsfr-to {
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+}
+
+.incoming-call {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.call {
+  border: 1px solid;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.chip {
+  padding: 3px 10px;
+  border: 1px solid #808080;
+  border-radius: 30px;
+  font-size: 12px;
+}
+
+/* .bottom-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: calc(100% - 240px);
+  padding: 0 24px;
+}
+.bottom-bar .chat-field textarea{
+  width: 100%;
+} */

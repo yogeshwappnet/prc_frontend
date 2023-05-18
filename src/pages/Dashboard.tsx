@@ -16,10 +16,11 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { mainListItems } from "../component/listItem";
 import { Outlet, useLocation } from "react-router";
-import { Fab } from "@mui/material";
+import { Fab, LinearProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { green } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
+import useNotification from "../hooks/useNotification";
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -95,10 +96,13 @@ const Dashboard: React.FC = () => {
   };
 
   const goToAdd = () => {
-    navigate('/dashboard/add')
-  }
+    navigate("/dashboard/add");
+  };
+
+  const { loading } = useNotification();
 
   const location = useLocation();
+  console.log(location);
   return (
     <>
       <ThemeProvider theme={mdTheme}>
@@ -129,13 +133,20 @@ const Dashboard: React.FC = () => {
                 noWrap
                 sx={{ flexGrow: 1 }}
               >
-                {location.pathname == "/dashboard"
-                  ? "Campaign"
+                {location.pathname == "/dashboard" ||
+                location.pathname == "/dashboard/"
+                  ? "Campaigns"
                   : location.pathname == "/dashboard/add"
                   ? "Add Campaign"
-                  : "Dashboard"}
+                  : location.pathname == "/dashboard/conversations"
+                  ? "Conversations"
+                  : (location.pathname).includes("/dashboard/conversation/")
+                  ? "Conversation"
+                  :  (location.pathname).includes("/dashboard/edit/")
+                  ? "Edit Campaign": "Dashboard"}
               </Typography>
             </Toolbar>
+            {loading && <LinearProgress />}
           </AppBar>
           <Drawer variant="permanent" open={open}>
             <Toolbar
@@ -151,10 +162,7 @@ const Dashboard: React.FC = () => {
               </IconButton>
             </Toolbar>
             <Divider />
-            <List component="nav">
-              {mainListItems}
-              <Divider sx={{ my: 1 }} />
-            </List>
+            <List component="nav">{mainListItems}</List>
           </Drawer>
           <Box
             component="main"
@@ -169,7 +177,11 @@ const Dashboard: React.FC = () => {
             }}
           >
             <Toolbar />
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Container
+              className="max-width"
+              maxWidth="lg"
+              sx={{ mt: 4, mb: 4 }}
+            >
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Paper
@@ -179,9 +191,19 @@ const Dashboard: React.FC = () => {
                   </Paper>
                 </Grid>
               </Grid>
-              <Fab sx={fabStyle} aria-label="Add" color="primary" onClick={goToAdd}>
-                <AddIcon></AddIcon>
-              </Fab>
+              {location.pathname == "/dashboard" ||
+              location.pathname == "/dashboard/" ? (
+                <Fab
+                  sx={fabStyle}
+                  aria-label="Add"
+                  color="primary"
+                  onClick={goToAdd}
+                >
+                  <AddIcon></AddIcon>
+                </Fab>
+              ) : (
+                ""
+              )}
             </Container>
           </Box>
         </Box>

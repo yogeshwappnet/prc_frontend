@@ -1,12 +1,4 @@
 import React, { useState } from "react";
-// interface IContextProps {
-//   message: string;
-//   setMessage: ({ type }: { type: string }) => void;
-//   typemessage: string;
-//   setTypeMessage: ({ type }: { type: string }) => void;
-//   loading: string;
-//   setLoading: ({ type }: { type: string }) => void;
-// }
 
 export const NotificationContext = React.createContext<any>({});
 
