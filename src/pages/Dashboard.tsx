@@ -102,7 +102,6 @@ const Dashboard: React.FC = () => {
   const { loading } = useNotification();
 
   const location = useLocation();
-  console.log(location);
   return (
     <>
       <ThemeProvider theme={mdTheme}>

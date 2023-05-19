@@ -36,6 +36,10 @@ code {
   margin-left: 16px;
 }
 
+.mr-10 {
+  margin-right: 10px;
+}
+
 .mb-16 {
   margin-bottom: 16px;
 }
@@ -152,6 +156,12 @@ code {
   font-size: 12px;
 }
 
+.text-ellipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 /* .bottom-bar {
   position: fixed;
   right: 0;
@@ -162,3 +172,23 @@ code {
 .bottom-bar .chat-field textarea{
   width: 100%;
 } */
+
+.popover-container {
+  padding: 20px;
+}
+
+.add-btn {
+  color: midnightblue;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.mb-15 {
+  margin-bottom: 15px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}

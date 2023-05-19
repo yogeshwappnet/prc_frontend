@@ -66,7 +66,7 @@ const Campaigns: React.FC = () => {
   }, []);
 
   const getCampaign = () => {
-    CampaignService.getCampaign().then(
+    CampaignService.getCampaigns().then(
       (response: any) => {
         if (response.data?.data.length > 0) {
           response.data.data = response.data.data.map((data) => {
@@ -111,34 +111,10 @@ const Campaigns: React.FC = () => {
         );
       }
     },
-    {
-      field: "conversations",
-      headerName: "Conversations",
-      sortable: false,
-      width: 140,
-      disableClickEventBubbling: true,
-      renderCell: (params) => {
-        return (
-          <div className="d-flex justify-content-between align-items-center" style={{ cursor: "pointer" }}>
-            <PeopleIcon
-              color="success"
-              sx={iconSize}
-              onClick={() => {
-                goToCampaign(params.row.id);
-              }}
-            />
-          </div>
-        );
-      }
-    }
   ];
 
   const editCampaign = (id) => {
     navigate(`/dashboard/edit/${id}`);
-  };
-
-  const goToCampaign = (id) => {
-    navigate(`/dashboard/conversations/${id}`);
   };
 
   return (

@@ -40,7 +40,7 @@ const Conversations: React.FC = () => {
   }, []);
 
   const getCampaign = () => {
-    CampaignService.getCampaign().then((response: any) => {
+    CampaignService.getCampaigns().then((response: any) => {
       if (response.data?.data.length > 0) {
         response.data.data = response.data.data.map((data) => {
           data["id"] = data._id;
@@ -66,10 +66,14 @@ const Conversations: React.FC = () => {
     }
   };
 
+  const goToConversation = (id) =>{
+   navigate(`/dashboard/conversation/${id}`);
+  }
+
   return (
     <>
       <Box sx={{ display: "flex" }}>
-        <List sx={{ mr: 2 }}>
+        <List sx={{ mr: 2, minWidth: "250px" }}>
           {campaigns.map((campaign, key) => {
             if (campaign._id === selectedCampaign?._id) {
               return (
@@ -126,7 +130,7 @@ const Conversations: React.FC = () => {
                           padding: "10px 16px",
                         }}
                       >
-                        <Grid
+                        <Grid onClick={() => goToConversation(conversation._id)}
                           container
                           spacing={3}
                           sx={{ alignItems: "center", textAlign: "center" }}
@@ -149,7 +153,7 @@ const Conversations: React.FC = () => {
                               ) : (
                                 '"'
                               )}
-                              <div>
+                              <div className="text-ellipsis">
                                 {conversation.last_message?.[0]?.messageText}
                               </div>
                               {!conversation.last_message?.[0]?.isOutgoing
