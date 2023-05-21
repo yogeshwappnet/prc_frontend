@@ -21,6 +21,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { green } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
 import useNotification from "../hooks/useNotification";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -99,6 +100,11 @@ const Dashboard: React.FC = () => {
     navigate("/dashboard/add");
   };
 
+  const logout = () =>{
+    localStorage.clear();
+    navigate("/");
+  }
+
   const { loading } = useNotification();
 
   const location = useLocation();
@@ -144,6 +150,7 @@ const Dashboard: React.FC = () => {
                   :  (location.pathname).includes("/dashboard/edit/")
                   ? "Edit Campaign": "Dashboard"}
               </Typography>
+              <LogoutIcon onClick={logout}></LogoutIcon>
             </Toolbar>
             {loading && <LinearProgress />}
           </AppBar>

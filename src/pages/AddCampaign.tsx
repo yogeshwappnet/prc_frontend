@@ -9,7 +9,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import useNotification from "../hooks/useNotification";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import { set, useForm } from "react-hook-form";
@@ -21,7 +20,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 type AddCampaignForm = {
   campaignName: string;
-  status: string;
+  status: boolean;
   forwardIncomingCall: boolean;
   forwardIncomingCallNumber: string;
   receipts: string;
@@ -41,11 +40,15 @@ const AddCampaign: React.FC = () => {
     },
   ]);
 
-  const [tempMessages, setTempMessaeges]= useState([]);
+  const [tempMessages, setTempMessaeges] = useState([]);
+
+  const [status, setStatus] = useState(false);
 
   const [filteredCount, setFilteredCount] = useState(0);
 
   const [error, setError] = useState(false);
+
+  const [readonly, setReadonly] = useState(false);
 
   const handleAddMessage = () => {
     setCampaignMessages([
@@ -73,7 +76,6 @@ const AddCampaign: React.FC = () => {
       "Phone number is required"
     ),
     timeOfDay: Yup.string().required("Time of the day is required"),
-    status: Yup.string(),
   });
 
   const {
@@ -125,22 +127,21 @@ const AddCampaign: React.FC = () => {
             allTempMessages[key]["isDeleted"] = false;
           }
         });
-        // messages.forEach((message, key) => {
-        //   let tempMessage = allTempMessages.filter((r) => {
-        //     if (r._id == message._id) {
-        //       return r;
-        //     }
-        //     message["isDeleted"] = tempMessage[0]["isDeleted"];
-        //   });
-        // });
 
         allTempMessages = allTempMessages.filter((r) => {
           if (r["isDeleted"]) {
             return r;
           }
         });
-      messages.push(...allTempMessages);
+        messages.push(...allTempMessages);
       }
+
+      messages = messages.map((message) => {
+        if (message._id === "") {
+          delete message["_id"];
+        }
+        return message;
+      });
 
       let filters = [];
 
@@ -159,7 +160,7 @@ const AddCampaign: React.FC = () => {
 
       const payload: any = {
         name: data.campaignName,
-        status: data.status == "true" ? "Active" : "Inactive",
+        status: status === true ? "Active" : "Inactive",
         forwardIncomingCall: data.forwardIncomingCall,
         forwardIncomingCallNumber: data.forwardIncomingCallNumber,
         receipts: data.receipts,
@@ -218,17 +219,17 @@ const AddCampaign: React.FC = () => {
 
   const getCampaign = () => {
     CampaignService.getCampaign(id).then((res) => {
+      setReadonly(true);
       setValue("campaignName", res.data.data.campaign.name);
-      setValue(
-        "status",
-        res.data.data.campaign.status == "Active" ? "true" : "false"
-      );
+     
       setValue(
         "forwardIncomingCallNumber",
         res.data.data.campaign.forwardIncomingCallNumber
       );
       setValue("timeOfDay", res.data.data.campaign.timeOfDay);
-
+      setStatus(
+        res.data.data.campaign.status === "Active" ? true : false
+      );
       let messages = [];
       res.data.data.message.forEach((message) => {
         messages.push({
@@ -254,15 +255,15 @@ const AddCampaign: React.FC = () => {
 
         filters.push({
           attribute: filter.attribute,
-          emptyValue: tempFilter[0].emptyValue,
-          name: tempFilter[0].name,
-          operator: tempFilter[0].operator,
-          selectedOperator: filter.operator,
+          emptyValue: tempFilter[0]?.emptyValue,
+          name: tempFilter[0]?.name,
+          operator: tempFilter[0]?.operator,
+          selectedOperator: filter?.operator,
           selectedValue: filter.value[0],
-          tableName: tempFilter[0].tableName,
-          type: tempFilter[0].type,
-          value: tempFilter[0].value,
-          _id: tempFilter[0]._id,
+          tableName: tempFilter[0]?.tableName || filter.tableName,
+          type: tempFilter[0]?.type,
+          value: tempFilter[0]?.value,
+          _id: tempFilter[0]?._id,
         });
       });
 
@@ -296,14 +297,6 @@ const AddCampaign: React.FC = () => {
         }
       });
     }
-
-    filters = [];
-    filters.push({
-      attribute: "name",
-      operator: "contains_any",
-      value: ["Kishan"],
-      tableName: "sales_account",
-    });
 
     if (filters.length > 0) {
       CampaignService.countReceipts({ filter_rule: filters }).then((res) => {
@@ -399,10 +392,11 @@ const AddCampaign: React.FC = () => {
           <Grid item xs={4}>
             <label> Status: </label>
             <Switch
-              {...register("status")}
+              checked = {status}
+              onChange={() =>  setStatus(!status)}
               inputProps={{ "aria-label": "controlled" }}
             />
-            <label> Active</label>
+            <label> {status ? 'Active' : 'Inactive'}</label>
           </Grid>
         </Grid>
         <Divider sx={{ my: 1, mb: 3 }} />
@@ -435,6 +429,9 @@ const AddCampaign: React.FC = () => {
           </Grid>
           <Grid item xs={4}>
             <TextField
+              InputProps={{
+                readOnly: readonly,
+              }}
               error={errors.timeOfDay ? true : false}
               type="time"
               sx={{ width: "100%" }}
@@ -465,6 +462,8 @@ const AddCampaign: React.FC = () => {
                   </Typography>
                   {index == 0 ? (
                     <></>
+                  ) : readonly ? (
+                    <> </>
                   ) : (
                     <DeleteOutlineIcon
                       onClick={() => handleRemoveMessage(index)}
@@ -477,6 +476,9 @@ const AddCampaign: React.FC = () => {
                       <div className="interval">
                         Interval:
                         <TextField
+                          InputProps={{
+                            readOnly: readonly,
+                          }}
                           sx={{ width: "8%", ml: 2, mr: 2 }}
                           label={`Delay for Message ${message.messageNumber}`}
                           variant="outlined"
@@ -503,6 +505,9 @@ const AddCampaign: React.FC = () => {
                       label={`Message Text ${message.messageNumber}`}
                       error={Boolean(message.isMessageError)}
                       value={message.messageText}
+                      InputProps={{
+                        readOnly: readonly,
+                      }}
                       onChange={(event) => updateMessageText(event, index)}
                       helperText={
                         Boolean(message.isMessageError)
@@ -516,16 +521,20 @@ const AddCampaign: React.FC = () => {
                 </Grid>
               </div>
             ))}
-            <Button
-              onClick={handleAddMessage}
-              sx={{
-                mt: 2,
-              }}
-              fullWidth
-              variant="contained"
-            >
-              Add Message
-            </Button>
+            {readonly == false ? (
+              <Button
+                onClick={handleAddMessage}
+                sx={{
+                  mt: 2,
+                }}
+                fullWidth
+                variant="contained"
+              >
+                Add Message
+              </Button>
+            ) : (
+              <></>
+            )}
             <Button
               type="submit"
               onClick={validate}
