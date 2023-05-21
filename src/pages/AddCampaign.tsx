@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Divider,
-  FormControl,
   Grid,
   Switch,
   TextField,
@@ -11,7 +10,7 @@ import {
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import CampaignService from "../services/CampaignService";
 import EditFilterPopover from "../partials/EditFilterPopover";
@@ -23,49 +22,14 @@ type AddCampaignForm = {
   status: boolean;
   forwardIncomingCall: boolean;
   forwardIncomingCallNumber: string;
-  receipts: string;
   timeOfDay: string;
-  messages: string;
 };
 
 const AddCampaign: React.FC = () => {
-  const [campaignMessages, setCampaignMessages] = useState([
-    {
-      messageNumber: "1",
-      messageText: "",
-      delay: 0,
-      isMessageError: false,
-      isDelayError: false,
-      _id: "",
-    },
-  ]);
-
-  const [tempMessages, setTempMessaeges] = useState([]);
-
-  const [status, setStatus] = useState(false);
-
-  const [filteredCount, setFilteredCount] = useState(0);
-
-  const [error, setError] = useState(false);
-
-  const [readonly, setReadonly] = useState(false);
-
-  const handleAddMessage = () => {
-    setCampaignMessages([
-      ...campaignMessages,
-      {
-        messageNumber: (campaignMessages.length + 1).toString(),
-        messageText: "",
-        delay: 0,
-        isMessageError: false,
-        isDelayError: false,
-        _id: "",
-      },
-    ]);
-  };
-
   const { id } = useParams();
+
   let allFilter = [];
+
   const navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
@@ -87,6 +51,47 @@ const AddCampaign: React.FC = () => {
   } = useForm<AddCampaignForm>({
     resolver: yupResolver(validationSchema),
   });
+
+  const [campaignMessages, setCampaignMessages] = useState([
+    {
+      messageNumber: "1",
+      messageText: "",
+      delay: 0,
+      isMessageError: false,
+      isDelayError: false,
+      _id: "",
+    },
+  ]);
+
+  const [tempMessages, setTempMessages] = useState([]);
+
+  const [status, setStatus] = useState(false);
+
+  const [count, setCount] = useState({
+    receipts: 0,
+    hasCalled: 0,
+    hasReplied: 0
+  });
+
+  const [error, setError] = useState(false);
+
+  const [readonly, setReadonly] = useState(false);
+
+  const [popoverData, setPopoverData] = useState([]);
+
+  const handleAddMessage = () => {
+    setCampaignMessages([
+      ...campaignMessages,
+      {
+        messageNumber: (campaignMessages.length + 1).toString(),
+        messageText: "",
+        delay: 0,
+        isMessageError: false,
+        isDelayError: false,
+        _id: "",
+      },
+    ]);
+  };
 
   const onSubmit = (data: AddCampaignForm) => {
     if (!error) {
@@ -163,7 +168,7 @@ const AddCampaign: React.FC = () => {
         status: status === true ? "Active" : "Inactive",
         forwardIncomingCall: data.forwardIncomingCall,
         forwardIncomingCallNumber: data.forwardIncomingCallNumber,
-        receipts: data.receipts,
+        receipts: count.receipts,
         filter: filters,
         timeOfDay: data.timeOfDay,
         messages: messages,
@@ -176,7 +181,6 @@ const AddCampaign: React.FC = () => {
       } else {
         CampaignService.addCampaignMessage(payload).then((response: any) => {
           reset();
-          console.log(">>>>>>>>>>", response);
           navigate("/");
         });
       }
@@ -199,8 +203,6 @@ const AddCampaign: React.FC = () => {
     setCampaignMessages(tempMessages);
   };
 
-  const [popoverData, setPopoverData] = useState([]);
-
   const handlePopoverData = (data) => {
     setPopoverData(data);
   };
@@ -219,10 +221,15 @@ const AddCampaign: React.FC = () => {
 
   const getCampaign = () => {
     CampaignService.getCampaign(id).then((res) => {
+      setCount({...count,
+        hasCalled: res.data.data.hasCalled,
+        hasReplied: res.data.data.hasReplied
+      });
+
       setReadonly(true);
+
       setValue("campaignName", res.data.data.campaign.name);
-     
-      setValue(
+     setValue(
         "forwardIncomingCallNumber",
         res.data.data.campaign.forwardIncomingCallNumber
       );
@@ -241,14 +248,14 @@ const AddCampaign: React.FC = () => {
           _id: message._id,
         });
       });
-      setTempMessaeges(messages);
+      setTempMessages(messages);
 
       setCampaignMessages(messages);
 
       let filters = [];
       res.data.data.campaign.filter.forEach((filter) => {
         let tempFilter = allFilter.filter((ftr) => {
-          if (ftr.attribute == filter.attribute) {
+          if (ftr.attribute === filter.attribute) {
             return ftr;
           }
         });
@@ -267,20 +274,9 @@ const AddCampaign: React.FC = () => {
         });
       });
 
-      console.log(filters);
       setPopoverData(filters);
     });
   };
-
-  useEffect(() => {
-    countReceipts();
-  }, [popoverData]);
-
-  useEffect(() => {
-    if (id) {
-      getAllFilters();
-    }
-  }, [id]);
 
   const countReceipts = () => {
     let filters = [];
@@ -300,7 +296,9 @@ const AddCampaign: React.FC = () => {
 
     if (filters.length > 0) {
       CampaignService.countReceipts({ filter_rule: filters }).then((res) => {
-        setFilteredCount(res.data.data.contactsCount);
+        setCount({...count,
+          receipts: res.data.data.contactsCount
+        });
       });
     }
   };
@@ -364,8 +362,19 @@ const AddCampaign: React.FC = () => {
     setCampaignMessages(tempMessages);
   };
 
+
+  useEffect(() => {
+    countReceipts();
+  }, [popoverData]);
+
+  useEffect(() => {
+    if (id) {
+      getAllFilters();
+    }
+  }, [id]);
+
+  
   return (
-    <>
       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
         <Grid
           container
@@ -553,23 +562,22 @@ const AddCampaign: React.FC = () => {
             <Divider sx={{ my: 1, mb: 3 }} />
             <div className="stats-container">
               <div>
-                <div className="stat-number">{filteredCount}</div>
+                <div className="stat-number">{count.receipts}</div>
                 <div className="stat-label">Receipts</div>
               </div>
               <div>
-                <div className="stat-number">0</div>
+                <div className="stat-number">{count.hasReplied}</div>
                 <div className="stat-label">Text Replies</div>
               </div>
 
               <div>
-                <div className="stat-number">0</div>
+                <div className="stat-number">{count.hasCalled}</div>
                 <div className="stat-label">Phone Calls</div>
               </div>
             </div>
           </Grid>
         </Grid>
       </Box>
-    </>
   );
 };
 

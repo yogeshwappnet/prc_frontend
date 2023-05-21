@@ -1,86 +1,12 @@
 import { DataGrid } from "@mui/x-data-grid";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import useNotification from "../hooks/useNotification";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CampaignService from "../services/CampaignService";
-import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import PeopleIcon from "@mui/icons-material/People";
 import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, TextField } from "@mui/material";
-import { useNavigationInterceptor } from "../AxiosInterceptor";
 
 const Campaigns: React.FC = () => {
   const navigate = useNavigate();
-  const [tempData, setTempData] = useState([]);
-
-  const [tableData, setTableData] = useState([]);
-  const [rowCount, setRowCount] = useState(0);
-
-  const [paginationModel, setPaginationModel] = React.useState({
-    page: 0,
-    pageSize: 10,
-  });
-
-  const [status, setStatus] = React.useState("");
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setStatus(event.target.value as string);
-  };
-
-  const [search, setSearch] = React.useState("");
-
-  const handleSearch = (event) => {
-    setSearch(event.target.value as string);
-  };
-
-  const filterData = () => {
-    let filteredData = tempData;
-
-    if (status !== "") {
-      // eslint-disable-next-line array-callback-return
-      filteredData = filteredData.filter((data) => {
-        if (data.status === status) {
-          return data;
-        }
-      });
-    }
-
-    if (search !== "") {
-      filteredData = filteredData.filter((data) => {
-        if (data.name.toLowerCase().includes(search.toLowerCase())) {
-          return data;
-        }
-      });
-    }
-
-    setTableData(filteredData);
-    setRowCount(filteredData.length);
-  };
-
-  useEffect(() => {
-    filterData();
-  }, [search, status]);
-
-  useEffect(() => {
-    getCampaign();
-  }, []);
-
-  const getCampaign = () => {
-    CampaignService.getCampaigns().then(
-      (response: any) => {
-        if (response.data?.data.length > 0) {
-          response.data.data = response.data.data.map((data) => {
-            data["id"] = data._id;
-            return data;
-          });
-          setRowCount(response.data?.data.length);
-        }
-
-        setTableData(response.data?.data);
-        setTempData(response.data?.data);
-      }
-    );
-  };
 
   const iconSize = {
     fontSize: { xs: "20px", md: "22px", lg: "24px" }
@@ -113,10 +39,80 @@ const Campaigns: React.FC = () => {
     },
   ];
 
+  const [tempData, setTempData] = useState([]);
+
+  const [tableData, setTableData] = useState([]);
+  const [rowCount, setRowCount] = useState(0);
+
+  const [paginationModel, setPaginationModel] = React.useState({
+    page: 0,
+    pageSize: 10,
+  });
+
+  const [search, setSearch] = React.useState("");
+
+  const [status, setStatus] = React.useState("");
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setStatus(event.target.value as string);
+  };
+
+  const handleSearch = (event) => {
+    setSearch(event.target.value as string);
+  };
+
+  const filterData = () => {
+    let filteredData = tempData;
+
+    if (status !== "") {
+      // eslint-disable-next-line array-callback-return
+      filteredData = filteredData.filter((data) => {
+        if (data.status === status) {
+          return data;
+        }
+      });
+    }
+
+    if (search !== "") {
+      filteredData = filteredData.filter((data) => {
+        if (data.name.toLowerCase().includes(search.toLowerCase())) {
+          return data;
+        }
+      });
+    }
+
+    setTableData(filteredData);
+    setRowCount(filteredData.length);
+  };
+ 
+  const getCampaign = () => {
+    CampaignService.getCampaigns().then(
+      (response: any) => {
+        if (response.data?.data.length > 0) {
+          response.data.data = response.data.data.map((data) => {
+            data["id"] = data._id;
+            return data;
+          });
+          setRowCount(response.data?.data.length);
+        }
+
+        setTableData(response.data?.data);
+        setTempData(response.data?.data);
+      }
+    );
+  };
+ 
   const editCampaign = (id) => {
     navigate(`/dashboard/edit/${id}`);
   };
 
+  useEffect(() => {
+    filterData();
+  }, [search, status]);
+
+  useEffect(() => {
+    getCampaign();
+  }, []);
   return (
     <>
       <div style={{ minHeight: 200, marginTop: "30px" }}>

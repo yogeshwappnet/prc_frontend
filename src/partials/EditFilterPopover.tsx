@@ -25,7 +25,6 @@ const EditFilterPopover: React.FC<PopoverComponentProps> = (props) => {
   };
 
   useEffect(() => {
-    console.log("A");
     setFilter(props.filter);
   }, [props.filter]);
 
@@ -64,7 +63,6 @@ const EditFilterPopover: React.FC<PopoverComponentProps> = (props) => {
       });
 
       setAllFilter(res.data);
-      console.log(res.data);
     });
   };
 

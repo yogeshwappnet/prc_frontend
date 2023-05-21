@@ -15,24 +15,22 @@ const Conversation: React.FC = () => {
 
   const [campaign, setCampaign] = React.useState({
     name: "",
-    _id: ""
+    _id: "",
   });
 
   const [contact, setContact] = React.useState({
-    id: ""
+    id: "",
   });
 
   const [account, setAccount] = React.useState({
     name: " ",
-    phone: " "
+    phone: " ",
   });
 
   const [groupedMessages, setGroupedMessages] = React.useState({});
 
   const getConversationDetails = (isGetData = false) => {
     ConversationService.getConversationMessages(id).then((res) => {
-      // console.log(res.data.data);
-      // group by date
       res.data.data = res.data.data.map((message) => {
         const sentDate = moment(message.sentDateTime).startOf("day");
         const today = moment().startOf("day");
@@ -47,7 +45,6 @@ const Conversation: React.FC = () => {
         }
         return message;
       });
-      console.log(res.data.data);
 
       let newGroupedMessages = [];
 
@@ -63,8 +60,6 @@ const Conversation: React.FC = () => {
       }
 
       setGroupedMessages(newGroupedMessages);
-
-      console.log(groupedMessages);
 
       setMessages(res.data.data);
       if (isGetData) {
@@ -94,7 +89,9 @@ const Conversation: React.FC = () => {
   };
 
   const sendMessage = () => {
-    let messageText = (document.getElementById("textMessage") as HTMLInputElement).value;
+    let messageText = (
+      document.getElementById("textMessage") as HTMLInputElement
+    ).value;
     if (messageText === "") {
       toast.error("Message cannot be empty.");
       return;
@@ -104,7 +101,7 @@ const Conversation: React.FC = () => {
         conversationId: id,
         contactId: contact.id,
         messageText: messageText,
-        to: messages[0].to
+        to: messages[0].to,
       }).then((res) => {
         getConversationDetails(false);
         (document.getElementById("textMessage") as HTMLInputElement).value = "";
@@ -117,73 +114,83 @@ const Conversation: React.FC = () => {
   }, [id]);
 
   return (
-    <>
-      <Box sx={{ display: "flex" }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <div className="d-flex align-items-center gap-4">
-              <div className="button-avatar">{account.name[0]}</div>
-              <div>
-                <div className="font-14">{account.name}</div>
-                <div className="font-12">Other: {account.phone ?? "-"}</div>
-                <div className="campaignName">{campaign.name}</div>
-              </div>
+    <Box sx={{ display: "flex" }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <div className="d-flex align-items-center gap-4">
+            <div className="button-avatar">{account.name[0]}</div>
+            <div>
+              <div className="font-14">{account.name}</div>
+              <div className="font-12">Other: {account.phone ?? "-"}</div>
+              <div className="campaignName">{campaign.name}</div>
             </div>
-            <Divider sx={{ mt: 3 }} />
-          </Grid>
-          <Grid item xs={12} className="calc-height">
-            {Object.entries(groupedMessages).map(([date, messages], index) => (
-              <React.Fragment key={index}>
-                <Divider>
-                  <div className="chip">
-                    {date === "Today"
-                      ? "Today"
-                      : date === "Yesterday"
-                      ? "Yesterday"
-                      : moment(date, "DD-MMM-YY").format("DD-MMM-YY")}
-                  </div>
-                </Divider>
-                {(messages as Array<any>).map((message, key) => (
-                  <div key={key}>
-                    <div className="d-flex align-items-center gap-4 mt-2">
-                      <div className="button-avatar black">
-                        {message?.isOutgoing ? campaign.name[0] : account.name[0]}
-                      </div>
-                      <div className="w-70">
-                        <div className="c-name d-flex align-items-center gap-4">
-                          {message?.isOutgoing ? campaign.name : account.name}
-                          <div className="time-name">{moment(message?.sentDateTime).format("h:mm a")}</div>
+          </div>
+          <Divider sx={{ mt: 3 }} />
+        </Grid>
+        <Grid item xs={12} className="calc-height">
+          {Object.entries(groupedMessages).map(([date, messages], index) => (
+            <React.Fragment key={index}>
+              <Divider>
+                <div className="chip">
+                  {date === "Today"
+                    ? "Today"
+                    : date === "Yesterday"
+                    ? "Yesterday"
+                    : moment(date, "DD-MMM-YY").format("DD-MMM-YY")}
+                </div>
+              </Divider>
+              {(messages as Array<any>).map((message, key) => (
+                <div key={key}>
+                  <div className="d-flex align-items-center gap-4 mt-2">
+                    <div className="button-avatar black">
+                      {message?.isOutgoing ? campaign.name[0] : account.name[0]}
+                    </div>
+                    <div className="w-70">
+                      <div className="c-name d-flex align-items-center gap-4">
+                        {message?.isOutgoing ? campaign.name : account.name}
+                        <div className="time-name">
+                          {moment(message?.sentDateTime).format("h:mm a")}
                         </div>
-                        {message?.status === "Call Received" ? (
-                          <div className="mt-2 call">
-                            <div className="incoming-call">
-                              <WifiCalling3Icon sx={{ fontSize: "14px", marginRight: "10px" }} />
-                              Incoming Call
-                            </div>
-                            <Divider />
-                            <div className="trnsfr-to"> Transferred To (832)-864-4938</div>
-                          </div>
-                        ) : (
-                          <div className="mt-2">{message?.messageText}</div>
-                        )}
                       </div>
+                      {message?.status === "Call Received" ? (
+                        <div className="mt-2 call">
+                          <div className="incoming-call">
+                            <WifiCalling3Icon
+                              sx={{ fontSize: "14px", marginRight: "10px" }}
+                            />
+                            Incoming Call
+                          </div>
+                          <Divider />
+                          <div className="trnsfr-to">
+                            {" "}
+                            Transferred To (832)-864-4938
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-2">{message?.messageText}</div>
+                      )}
                     </div>
                   </div>
-                ))}
-              </React.Fragment>
-            ))}
-          </Grid>
-          <Grid item xs={12}>
-            <div className="d-flex align-items-center">
-              <TextField sx={{ width: "100%", mb: 2 }} multiline rows={4} id="textMessage"></TextField>
-              <Fab color="primary" sx={{ ml: 2 }} onClick={sendMessage}>
-                <SendIcon />
-              </Fab>
-            </div>
-          </Grid>
+                </div>
+              ))}
+            </React.Fragment>
+          ))}
         </Grid>
-      </Box>
-    </>
+        <Grid item xs={12}>
+          <div className="d-flex align-items-center">
+            <TextField
+              sx={{ width: "100%", mb: 2 }}
+              multiline
+              rows={4}
+              id="textMessage"
+            ></TextField>
+            <Fab color="primary" sx={{ ml: 2 }} onClick={sendMessage}>
+              <SendIcon />
+            </Fab>
+          </div>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

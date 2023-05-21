@@ -18,13 +18,23 @@ import { mainListItems } from "../component/listItem";
 import { Outlet, useLocation } from "react-router";
 import { Fab, LinearProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { green } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
 import useNotification from "../hooks/useNotification";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { loading } = useNotification();
+  const location = useLocation();
+
+  const fabStyle = {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+  };
+
+  const [open, setOpen] = React.useState(true);
+
   const drawerWidth: number = 240;
 
   interface AppBarProps extends MuiAppBarProps {
@@ -77,144 +87,119 @@ const Dashboard: React.FC = () => {
 
   const mdTheme = createTheme();
 
-  const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
-  };
-
-  const fabStyle = {
-    position: "absolute",
-    bottom: 16,
-    right: 16,
-  };
-
-  const fabGreenStyle = {
-    color: "common.white",
-    bgcolor: green[500],
-    "&:hover": {
-      bgcolor: green[600],
-    },
   };
 
   const goToAdd = () => {
     navigate("/dashboard/add");
   };
 
-  const logout = () =>{
+  const logout = () => {
     localStorage.clear();
     navigate("/");
-  }
+  };
 
-  const { loading } = useNotification();
-
-  const location = useLocation();
   return (
-    <>
-      <ThemeProvider theme={mdTheme}>
-        <Box sx={{ display: "flex" }}>
-          <CssBaseline />
-          <AppBar position="absolute" open={open}>
-            <Toolbar
-              sx={{
-                pr: "24px", // keep right padding when drawer closed
-              }}
-            >
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleDrawer}
-                sx={{
-                  marginRight: "36px",
-                  ...(open && { display: "none" }),
-                }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography
-                component="h1"
-                variant="h6"
-                color="inherit"
-                noWrap
-                sx={{ flexGrow: 1 }}
-              >
-                {location.pathname == "/dashboard" ||
-                location.pathname == "/dashboard/"
-                  ? "Campaigns"
-                  : location.pathname == "/dashboard/add"
-                  ? "Add Campaign"
-                  : location.pathname == "/dashboard/conversations"
-                  ? "Conversations"
-                  : (location.pathname).includes("/dashboard/conversation/")
-                  ? "Conversation"
-                  :  (location.pathname).includes("/dashboard/edit/")
-                  ? "Edit Campaign": "Dashboard"}
-              </Typography>
-              <LogoutIcon onClick={logout}></LogoutIcon>
-            </Toolbar>
-            {loading && <LinearProgress />}
-          </AppBar>
-          <Drawer variant="permanent" open={open}>
-            <Toolbar
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                px: [1],
-              }}
-            >
-              <IconButton onClick={toggleDrawer}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </Toolbar>
-            <Divider />
-            <List component="nav">{mainListItems}</List>
-          </Drawer>
-          <Box
-            component="main"
+    <ThemeProvider theme={mdTheme}>
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <AppBar position="absolute" open={open}>
+          <Toolbar
             sx={{
-              backgroundColor: (theme) =>
-                theme.palette.mode === "light"
-                  ? theme.palette.grey[100]
-                  : theme.palette.grey[900],
-              flexGrow: 1,
-              height: "100vh",
-              overflow: "auto",
+              pr: "24px",
             }}
           >
-            <Toolbar />
-            <Container
-              className="max-width"
-              maxWidth="lg"
-              sx={{ mt: 4, mb: 4 }}
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer}
+              sx={{
+                marginRight: "36px",
+                ...(open && { display: "none" }),
+              }}
             >
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Paper
-                    sx={{ p: 2, display: "flex", flexDirection: "column" }}
-                  >
-                    <Outlet />
-                  </Paper>
-                </Grid>
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              sx={{ flexGrow: 1 }}
+            >
+              {location.pathname === "/dashboard" ||
+              location.pathname === "/dashboard/"
+                ? "Campaigns"
+                : location.pathname === "/dashboard/add"
+                ? "Add Campaign"
+                : location.pathname === "/dashboard/conversations"
+                ? "Conversations"
+                : location.pathname.includes("/dashboard/conversation/")
+                ? "Conversation"
+                : location.pathname.includes("/dashboard/edit/")
+                ? "Edit Campaign"
+                : "Dashboard"}
+            </Typography>
+            <LogoutIcon onClick={logout}></LogoutIcon>
+          </Toolbar>
+          {loading && <LinearProgress />}
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <Toolbar
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              px: [1],
+            }}
+          >
+            <IconButton onClick={toggleDrawer}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </Toolbar>
+          <Divider />
+          <List component="nav">{mainListItems}</List>
+        </Drawer>
+        <Box
+          component="main"
+          sx={{
+            backgroundColor: (theme) =>
+              theme.palette.mode === "light"
+                ? theme.palette.grey[100]
+                : theme.palette.grey[900],
+            flexGrow: 1,
+            height: "100vh",
+            overflow: "auto",
+          }}
+        >
+          <Toolbar />
+          <Container className="max-width" maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+                  <Outlet />
+                </Paper>
               </Grid>
-              {location.pathname == "/dashboard" ||
-              location.pathname == "/dashboard/" ? (
-                <Fab
-                  sx={fabStyle}
-                  aria-label="Add"
-                  color="primary"
-                  onClick={goToAdd}
-                >
-                  <AddIcon></AddIcon>
-                </Fab>
-              ) : (
-                ""
-              )}
-            </Container>
-          </Box>
+            </Grid>
+            {location.pathname === "/dashboard" ||
+            location.pathname === "/dashboard/" ? (
+              <Fab
+                sx={fabStyle}
+                aria-label="Add"
+                color="primary"
+                onClick={goToAdd}
+              >
+                <AddIcon></AddIcon>
+              </Fab>
+            ) : (
+              ""
+            )}
+          </Container>
         </Box>
-      </ThemeProvider>
-    </>
+      </Box>
+    </ThemeProvider>
   );
 };
 

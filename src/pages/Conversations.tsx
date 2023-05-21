@@ -1,11 +1,9 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import useNotification from "../hooks/useNotification";
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import CampaignService from "../services/CampaignService";
 import {
   Box,
   Container,
-  Fab,
   Grid,
   List,
   ListItem,
@@ -13,7 +11,6 @@ import {
   ListItemIcon,
   ListItemText,
   Paper,
-  Toolbar,
 } from "@mui/material";
 import React from "react";
 import StarIcon from "@mui/icons-material/Star";
@@ -34,10 +31,6 @@ const Conversations: React.FC = () => {
     receipts: "",
     replies: "",
   });
-
-  useEffect(() => {
-    getCampaign();
-  }, []);
 
   const getCampaign = () => {
     CampaignService.getCampaigns().then((response: any) => {
@@ -66,12 +59,15 @@ const Conversations: React.FC = () => {
     }
   };
 
-  const goToConversation = (id) =>{
-   navigate(`/dashboard/conversation/${id}`);
-  }
+  const goToConversation = (id) => {
+    navigate(`/dashboard/conversation/${id}`);
+  };
+
+  useEffect(() => {
+    getCampaign();
+  }, []);
 
   return (
-    <>
       <Box sx={{ display: "flex" }}>
         <List sx={{ mr: 2, minWidth: "250px" }}>
           {campaigns.map((campaign, key) => {
@@ -130,7 +126,8 @@ const Conversations: React.FC = () => {
                           padding: "10px 16px",
                         }}
                       >
-                        <Grid onClick={() => goToConversation(conversation._id)}
+                        <Grid
+                          onClick={() => goToConversation(conversation._id)}
                           container
                           spacing={3}
                           sx={{ alignItems: "center", textAlign: "center" }}
@@ -196,7 +193,6 @@ const Conversations: React.FC = () => {
           </Container>
         </Box>
       </Box>
-    </>
   );
 };
 
