@@ -40,6 +40,10 @@ code {
   margin-right: 10px;
 }
 
+.mr-15 {
+  margin-right: 15px;
+}
+
 .mb-16 {
   margin-bottom: 16px;
 }
@@ -191,4 +195,14 @@ code {
 
 .mt-20 {
   margin-top: 20px;
+}
+
+.height-130 {
+  height: calc(100vh - 130px);
+  overflow: auto;
+}
+
+.height-170 {
+  height: calc(100vh - 170px);
+  overflow: auto;
 }

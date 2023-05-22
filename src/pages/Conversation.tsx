@@ -152,6 +152,12 @@ const Conversation: React.FC = () => {
                           {moment(message?.sentDateTime).format("h:mm a")}
                         </div>
                       </div>
+                      <div className="w-70">
+                        <div className="c-name d-flex align-items-center gap-4">
+                          {message?.isOutgoing ? campaign.name : account.name}
+                          <div className="time-name">{moment(message?.sentDateTime).format("h:mm a")}</div>
+                        </div>
+                      </div>
                       {message?.status === "Call Received" ? (
                         <div className="mt-2 call">
                           <div className="incoming-call">
@@ -175,7 +181,7 @@ const Conversation: React.FC = () => {
               ))}
             </React.Fragment>
           ))}
-        </Grid>
+          </Grid>
         <Grid item xs={12}>
           <div className="d-flex align-items-center">
             <TextField

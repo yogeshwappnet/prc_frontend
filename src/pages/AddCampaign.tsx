@@ -278,6 +278,12 @@ const AddCampaign: React.FC = () => {
     });
   };
 
+  useEffect(() => {
+    if (id) {
+      getAllFilters();
+    }
+  }, [id]);
+
   const countReceipts = () => {
     let filters = [];
 

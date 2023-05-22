@@ -4,7 +4,7 @@ const CopyRight: React.FC = () => {
   return (
     <>
       <Typography variant="body2" color="text.secondary" align="center">
-        v0.0.2
+        v0.0.3
       </Typography>
       <Typography variant="body2" color="text.secondary" align="center">
         {"Copyright © "}
@@ -14,7 +14,6 @@ const CopyRight: React.FC = () => {
         {new Date().getFullYear()}
         {"."}
       </Typography>
-    
     </>
   );
 };

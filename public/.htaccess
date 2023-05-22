@@ -1,0 +1,10 @@
+
+Options -MultiViews
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.html [QSA,L]
+
+    # Removing the www prefix from domain URLs
+    RewriteCond %{HTTP_HOST} ^www\.
+    RewriteRule ^(.*)$ http://projects.wappnet.us/PRC_campaign_frontend/$1 [R=301,L]
+
